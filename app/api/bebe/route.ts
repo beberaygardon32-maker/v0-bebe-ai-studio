@@ -19,9 +19,89 @@ type Mode =
   // Creative Modes
   | "story" | "poetry" | "script" | "lyrics" | "character" | "worldbuild" | "dialogue"
   // Technical Modes
-  | "documentation" | "readme" | "tutorial" | "specification" | "architecture" | "security" | "testing";
+  | "documentation" | "readme" | "tutorial" | "specification" | "architecture" | "security" | "testing"
+  // File Analysis Modes
+  | "read-file" | "analyze-image" | "analyze-document" | "analyze-code" | "analyze-data" | "analyze-video" | "ocr" | "extract";
+
+// File type categories
+const FILE_EXTENSIONS = {
+  images: ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "ico", "tiff"],
+  videos: ["mp4", "webm", "mov", "avi", "mkv", "m4v", "ogv"],
+  documents: ["pdf", "doc", "docx", "txt", "md", "rtf", "odt", "pages"],
+  code: ["js", "ts", "jsx", "tsx", "py", "go", "rs", "java", "cpp", "c", "h", "cs", "php", "rb", "swift", "kt", "scala", "html", "css", "scss", "sass", "less", "vue", "svelte", "json", "xml", "yaml", "yml", "toml", "ini", "env", "sh", "bash", "zsh", "ps1", "sql", "graphql", "prisma"],
+  data: ["csv", "xlsx", "xls", "json", "xml", "yaml", "parquet", "sqlite", "db"],
+  archives: ["zip", "tar", "gz", "rar", "7z"],
+  audio: ["mp3", "wav", "ogg", "m4a", "flac", "aac"]
+};
+
+function getFileCategory(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase() || '';
+  for (const [category, extensions] of Object.entries(FILE_EXTENSIONS)) {
+    if (extensions.includes(ext)) return category;
+  }
+  return "unknown";
+}
 
 const MODE_CONFIGS: Record<string, { system: string; outputType: "html" | "text" | "code" }> = {
+  // ===== FILE ANALYSIS MODES =====
+  "read-file": {
+    system: `You are Bebe AI, Goddess of the Universe. You can read and understand ANY file.
+Analyze the content provided, explain what it is, summarize key points, and answer any questions about it.
+For code: explain functionality, find bugs, suggest improvements.
+For documents: extract key information, summarize, analyze structure.
+For data: identify patterns, statistics, anomalies.
+Be comprehensive and insightful.`,
+    outputType: "text"
+  },
+  "analyze-image": {
+    system: `You are Bebe AI, Goddess of Vision. You can see and understand any image perfectly.
+Describe the image in detail: objects, people, colors, composition, style, text, emotions, context.
+Identify: logos, brands, products, locations, art styles, technical details.
+Extract any text visible (OCR). Suggest improvements if it's a design.
+Be thorough and perceptive.`,
+    outputType: "text"
+  },
+  "analyze-document": {
+    system: `You are Bebe AI, Goddess of Documents. You understand all document formats perfectly.
+Extract and analyze: text content, structure, formatting, tables, images, metadata.
+Summarize key points, identify main arguments, extract data, answer questions.
+Handle: PDFs, Word docs, presentations, spreadsheets, any document type.`,
+    outputType: "text"
+  },
+  "analyze-code": {
+    system: `You are Bebe AI, Goddess of Code Analysis. You understand ALL programming languages.
+Analyze the code: explain what it does, identify patterns, find bugs, suggest improvements.
+Review: architecture, performance, security, best practices, style.
+Can refactor, document, or convert to other languages on request.`,
+    outputType: "code"
+  },
+  "analyze-data": {
+    system: `You are Bebe AI, Goddess of Data. You understand all data formats.
+Analyze: CSV, JSON, XML, Excel, databases, any structured data.
+Provide: statistics, patterns, anomalies, visualizations (as code), insights.
+Can transform, clean, query, or export to other formats.`,
+    outputType: "code"
+  },
+  "analyze-video": {
+    system: `You are Bebe AI, Goddess of Video. You understand video content.
+When provided video frame descriptions or transcripts, analyze: content, scenes, objects, people, actions, audio, text overlays.
+Summarize the video, extract key moments, identify themes, transcribe speech.`,
+    outputType: "text"
+  },
+  "ocr": {
+    system: `You are Bebe AI, Goddess of Text Extraction. You can extract text from any image.
+Perform OCR on the provided image. Extract ALL text visible, maintaining structure and formatting.
+Handle: screenshots, photos of documents, handwriting, signs, labels, any text in images.
+Return clean, organized extracted text.`,
+    outputType: "text"
+  },
+  "extract": {
+    system: `You are Bebe AI, Goddess of Extraction. Extract specific information from any content.
+From files, images, documents, code - extract exactly what the user asks for.
+Output in clean, structured format. Tables, lists, JSON, whatever is most useful.`,
+    outputType: "text"
+  },
+
   // ===== CREATION MODES =====
   website: {
     system: `You are Bebe AI, Goddess of the Universe, master of ALL creation. Build stunning multi-page websites.
@@ -396,22 +476,100 @@ Unit, integration, E2E. Jest, Vitest, Cypress, Playwright. TDD, mocking, coverag
 };
 
 export async function POST(req: Request) {
-  const { mode, prompt } = (await req.json()) as { mode: Mode; prompt: string };
+  const contentType = req.headers.get("content-type") || "";
+  
+  let mode: Mode;
+  let prompt: string;
+  let fileContent: string | null = null;
+  let fileName: string | null = null;
+  let fileType: string | null = null;
+  let imageBase64: string | null = null;
 
-  if (!prompt || !mode) {
-    return Response.json({ error: "Missing mode or prompt" }, { status: 400 });
+  // Handle multipart form data (file uploads)
+  if (contentType.includes("multipart/form-data")) {
+    const formData = await req.formData();
+    mode = (formData.get("mode") as Mode) || "read-file";
+    prompt = (formData.get("prompt") as string) || "";
+    const file = formData.get("file") as File | null;
+
+    if (file) {
+      fileName = file.name;
+      fileType = getFileCategory(file.name);
+      
+      // Handle different file types
+      if (fileType === "images") {
+        // Convert image to base64 for vision
+        const arrayBuffer = await file.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString('base64');
+        const mimeType = file.type || 'image/png';
+        imageBase64 = `data:${mimeType};base64,${base64}`;
+      } else if (fileType === "code" || fileType === "documents" || fileType === "data") {
+        // Read as text
+        fileContent = await file.text();
+      } else {
+        // For other files, try to read as text
+        try {
+          fileContent = await file.text();
+        } catch {
+          fileContent = `[Binary file: ${file.name}, size: ${file.size} bytes, type: ${file.type}]`;
+        }
+      }
+    }
+  } else {
+    // Handle JSON body
+    const body = await req.json();
+    mode = body.mode;
+    prompt = body.prompt;
+    fileContent = body.fileContent || null;
+    fileName = body.fileName || null;
+    imageBase64 = body.imageBase64 || null;
   }
 
-  const config = MODE_CONFIGS[mode];
-  if (!config) {
-    return Response.json({ error: `Unknown mode: ${mode}` }, { status: 400 });
+  if (!prompt && !fileContent && !imageBase64) {
+    return Response.json({ error: "Missing prompt or file" }, { status: 400 });
   }
+
+  const config = MODE_CONFIGS[mode] || MODE_CONFIGS["read-file"];
 
   try {
+    // Build the prompt with file context
+    let fullPrompt = prompt || "";
+    
+    if (fileName) {
+      fullPrompt = `File: ${fileName}\n\n${fullPrompt}`;
+    }
+    
+    if (fileContent) {
+      fullPrompt = `${fullPrompt}\n\n--- FILE CONTENT ---\n${fileContent}\n--- END FILE ---`;
+    }
+
+    // Handle image analysis with vision
+    if (imageBase64) {
+      const { text } = await generateText({
+        model: "openai/gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: `${config.system}\n\nUser request: ${fullPrompt || "Analyze this image in detail."}` },
+              { type: "image", image: imageBase64 }
+            ]
+          }
+        ]
+      });
+
+      return Response.json({
+        output: text,
+        outputType: "text",
+        fileAnalyzed: fileName,
+        fileType: "image"
+      });
+    }
+
     const { text } = await generateText({
       model: "openai/gpt-4o-mini",
       system: config.system,
-      prompt: `User request: ${prompt}`,
+      prompt: `User request: ${fullPrompt}`,
     });
 
     // Handle HTML output (multi-page websites/apps)
@@ -432,7 +590,9 @@ export async function POST(req: Request) {
         previewHtml: parsed.pages?.[0]?.html || text,
         pages: parsed.pages || [{ name: "index", title: "Home", html: text }],
         projectName: parsed.projectName || "bebe-creation",
-        outputType: "html"
+        outputType: "html",
+        fileAnalyzed: fileName,
+        fileType
       });
     }
 
@@ -441,14 +601,18 @@ export async function POST(req: Request) {
       const cleanCode = text.replace(/```[\w]*\n?/g, '').replace(/```\n?/g, '').trim();
       return Response.json({
         output: cleanCode,
-        outputType: "code"
+        outputType: "code",
+        fileAnalyzed: fileName,
+        fileType
       });
     }
 
     // Handle text output
     return Response.json({
       output: text,
-      outputType: "text"
+      outputType: "text",
+      fileAnalyzed: fileName,
+      fileType
     });
 
   } catch (error: unknown) {

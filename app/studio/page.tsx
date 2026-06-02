@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 
-// ALL AI MODES - Every ability in the universe
+// ALL AI MODES - Every ability in the universe (now 71 powers with file analysis)
 const MODE_CATEGORIES = {
+  "Files": ["read-file", "analyze-image", "analyze-document", "analyze-code", "analyze-data", "analyze-video", "ocr", "extract"],
   "Creation": ["website", "app", "ai-system", "game", "dashboard", "landing-page", "ecommerce", "portfolio", "blog"],
   "Code": ["code", "debug", "refactor", "optimize", "convert", "api", "database", "algorithm"],
   "Content": ["write", "edit-fix", "translate", "summarize", "expand", "rewrite", "copywriting", "seo"],
@@ -19,6 +20,17 @@ const MODE_CATEGORIES = {
 type Mode = typeof MODE_CATEGORIES[keyof typeof MODE_CATEGORIES][number];
 
 const ALL_MODES = Object.values(MODE_CATEGORIES).flat() as Mode[];
+
+const MODE_DESCRIPTIONS: Record<string, string> = {
+  "read-file": "Read & understand any file",
+  "analyze-image": "See & analyze images",
+  "analyze-document": "Understand PDFs, docs, etc.",
+  "analyze-code": "Deep code analysis",
+  "analyze-data": "CSV, JSON, Excel analysis",
+  "analyze-video": "Video content analysis",
+  "ocr": "Extract text from images",
+  "extract": "Extract specific info"
+};
 
 type Page = {
   name: string;
@@ -40,7 +52,7 @@ export default function Studio() {
   const [activeCategory, setActiveCategory] = useState<string>("Creation");
   const [prompt, setPrompt] = useState("");
   const [output, setOutput] = useState(
-    "// Bebe AI - Goddess of the Universe\n// All AI Powers Active\n// 63 Modes Ready\n\n// Select any mode and tell Bebe AI what to create."
+    "// Bebe AI - Goddess of the Universe\n// All AI Powers Active - 71 Modes Ready\n// 100% FREE - No Credits - No Limits\n\n// Created by Bebe Ray Gardon\n\n// Upload any file or enter a prompt.\n// Bebe AI can read and understand EVERYTHING."
   );
   const [pages, setPages] = useState<Page[]>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -48,6 +60,12 @@ export default function Studio() {
   const [projectName, setProjectName] = useState("bebe-creation");
   const [loading, setLoading] = useState(false);
   const [outputType, setOutputType] = useState<"html" | "code" | "text">("html");
+  
+  // File upload state
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const createPreviewUrl = useCallback((html: string, allPages: Page[]) => {
     const navScript = `
@@ -103,8 +121,66 @@ export default function Studio() {
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (filePreview) URL.revokeObjectURL(filePreview);
     };
-  }, [previewUrl]);
+  }, [previewUrl, filePreview]);
+
+  // Handle file selection
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+    
+    // Create preview for images
+    if (file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      setFilePreview(url);
+      setActiveCategory("Files");
+      setMode("analyze-image");
+    } else if (file.name.match(/\.(js|ts|jsx|tsx|py|go|rs|java|cpp|c|php|rb|swift|html|css|json|xml|yaml)$/i)) {
+      setActiveCategory("Files");
+      setMode("analyze-code");
+    } else if (file.name.match(/\.(csv|xlsx|xls)$/i)) {
+      setActiveCategory("Files");
+      setMode("analyze-data");
+    } else if (file.name.match(/\.(pdf|doc|docx|txt|md)$/i)) {
+      setActiveCategory("Files");
+      setMode("analyze-document");
+    } else {
+      setActiveCategory("Files");
+      setMode("read-file");
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  };
+
+  const clearFile = () => {
+    setSelectedFile(null);
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+      setFilePreview(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   function saveProject(mode: Mode, prompt: string, pages: Page[], projectName: string) {
     const project: Project = {
@@ -153,18 +229,42 @@ export default function Studio() {
   }
 
   async function handleGenerate() {
-    if (!prompt.trim()) return;
+    if (!prompt.trim() && !selectedFile) return;
     setLoading(true);
     setPages([]);
     setCurrentPageIndex(0);
+    
     try {
-      const res = await fetch("/api/bebe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, prompt }),
-      });
+      let res: Response;
+      
+      if (selectedFile) {
+        // Use FormData for file upload
+        const formData = new FormData();
+        formData.append("mode", mode);
+        formData.append("prompt", prompt);
+        formData.append("file", selectedFile);
+        
+        res = await fetch("/api/bebe", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        // Use JSON for text-only requests
+        res = await fetch("/api/bebe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode, prompt }),
+        });
+      }
+      
       const data = await res.json();
-      setOutput(data.output || "// No output returned.");
+      
+      if (data.fileAnalyzed) {
+        setOutput(`// Analyzed: ${data.fileAnalyzed}\n// Type: ${data.fileType}\n\n${data.output || "// No output returned."}`);
+      } else {
+        setOutput(data.output || "// No output returned.");
+      }
+      
       setOutputType(data.outputType || "text");
       
       if (data.pages && data.pages.length > 0) {
@@ -217,7 +317,7 @@ export default function Studio() {
       </header>
 
       <main className="flex-1 grid lg:grid-cols-[1fr_1.2fr_1.4fr] gap-2 p-2 min-h-0">
-        {/* Left: Modes + Prompt */}
+        {/* Left: Modes + File Upload + Prompt */}
         <section className="bg-black/80 border border-white/20 rounded-xl p-2 flex flex-col gap-2 shadow-2xl overflow-hidden">
           {/* Category tabs */}
           <div className="flex flex-wrap gap-1">
@@ -231,13 +331,13 @@ export default function Studio() {
                     : "bg-black/60 border border-white/30 hover:border-white/50"
                 }`}
               >
-                {cat}
+                {cat === "Files" ? `${cat} (Upload)` : cat}
               </button>
             ))}
           </div>
 
           {/* Mode buttons for active category */}
-          <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+          <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
             {MODE_CATEGORIES[activeCategory as keyof typeof MODE_CATEGORIES].map((m) => (
               <button
                 key={m}
@@ -247,6 +347,7 @@ export default function Studio() {
                     ? "bg-gradient-to-r from-pink-500 to-rose-600 border-white shadow-[0_0_10px_rgba(244,114,182,0.8)]"
                     : "bg-black/60 border-white/30 hover:border-white/50"
                 }`}
+                title={MODE_DESCRIPTIONS[m] || m}
               >
                 {m.replace(/-/g, " ")}
               </button>
@@ -257,28 +358,96 @@ export default function Studio() {
           <div className="px-2 py-1 bg-gradient-to-r from-pink-500/20 to-fuchsia-600/20 rounded-lg border border-pink-500/30">
             <div className="text-[0.5rem] uppercase tracking-[0.15em] text-pink-300">Active Power</div>
             <div className="text-sm font-bold uppercase tracking-[0.1em]">{mode.replace(/-/g, " ")}</div>
+            {MODE_DESCRIPTIONS[mode] && (
+              <div className="text-[0.5rem] text-white/60">{MODE_DESCRIPTIONS[mode]}</div>
+            )}
+          </div>
+
+          {/* File Upload Zone */}
+          <div
+            className={`relative border-2 border-dashed rounded-lg p-3 text-center transition-all cursor-pointer ${
+              dragActive
+                ? "border-pink-400 bg-pink-500/20"
+                : selectedFile
+                ? "border-emerald-400 bg-emerald-500/10"
+                : "border-white/30 hover:border-white/50 bg-black/40"
+            }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+              accept="*/*"
+            />
+            
+            {selectedFile ? (
+              <div className="flex items-center gap-2">
+                {filePreview ? (
+                  <img src={filePreview} alt="Preview" className="w-10 h-10 object-cover rounded" />
+                ) : (
+                  <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                )}
+                <div className="flex-1 text-left">
+                  <div className="text-[0.6rem] font-medium truncate">{selectedFile.name}</div>
+                  <div className="text-[0.5rem] text-white/50">{(selectedFile.size / 1024).toFixed(1)} KB</div>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); clearFile(); }}
+                  className="p-1 hover:bg-white/10 rounded"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <div>
+                <svg className="w-6 h-6 mx-auto mb-1 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <div className="text-[0.55rem] uppercase tracking-[0.1em] text-white/60">
+                  Drop any file or click to upload
+                </div>
+                <div className="text-[0.45rem] text-white/40 mt-0.5">
+                  Images, PDFs, Code, Data, Documents - EVERYTHING
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Prompt input */}
           <textarea
-            className="flex-1 rounded-lg border border-white/20 bg-black/70 text-[0.7rem] p-2 outline-none resize-none focus:border-pink-500/50 transition-colors placeholder:text-white/40 min-h-[100px]"
-            placeholder={`Tell Bebe AI what to create...\n\nExamples:\n- "Build a fitness tracking dashboard"\n- "Write a love poem about stars"\n- "Debug this Python code: ..."\n- "Create a marketing plan for my startup"`}
+            className="flex-1 rounded-lg border border-white/20 bg-black/70 text-[0.7rem] p-2 outline-none resize-none focus:border-pink-500/50 transition-colors placeholder:text-white/40 min-h-[80px]"
+            placeholder={selectedFile 
+              ? `What do you want Bebe AI to do with "${selectedFile.name}"?\n\nExamples:\n- "Explain this code"\n- "Find bugs and fix them"\n- "Extract all text"\n- "Summarize this document"`
+              : `Tell Bebe AI what to create...\n\nExamples:\n- "Build a fitness tracking dashboard"\n- "Write a love poem about stars"\n- "Debug this Python code: ..."`
+            }
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           />
           <div className="flex justify-end gap-2">
             <button
-              onClick={() => setPrompt("")}
+              onClick={() => { setPrompt(""); clearFile(); }}
               className="px-2 py-1 rounded-full border border-white/30 bg-black/70 text-[0.5rem] uppercase tracking-[0.12em] hover:bg-black/90"
             >
-              Clear
+              Clear All
             </button>
             <button
               onClick={handleGenerate}
-              disabled={loading || !prompt.trim()}
+              disabled={loading || (!prompt.trim() && !selectedFile)}
               className="px-3 py-1 rounded-full border border-white/90 bg-gradient-to-r from-pink-500 to-rose-600 text-[0.55rem] uppercase tracking-[0.12em] shadow-[0_0_14px_rgba(244,114,182,0.9)] disabled:opacity-60 hover:shadow-[0_0_20px_rgba(244,114,182,1)]"
             >
-              {loading ? "Creating..." : "Let Bebe AI Work"}
+              {loading ? "Working..." : selectedFile ? "Analyze File" : "Let Bebe AI Work"}
             </button>
           </div>
         </section>
@@ -363,12 +532,21 @@ export default function Studio() {
                   <p className="uppercase tracking-[0.15em] text-[0.6rem]">
                     {outputType === "html" ? "Run a build to see preview" : "Preview for HTML modes"}
                   </p>
+                  <p className="text-[0.5rem] text-white/40 mt-1">
+                    {ALL_MODES.length} Powers Ready
+                  </p>
                 </div>
               </div>
             )}
           </div>
         </section>
       </main>
+
+      {/* Footer */}
+      <footer className="px-4 py-1.5 text-[0.5rem] uppercase tracking-[0.15em] text-white/50 flex justify-between border-t border-white/10">
+        <span>Created by Bebe Ray Gardon</span>
+        <span>{ALL_MODES.length} Powers - 100% Free - Unlimited</span>
+      </footer>
     </div>
   );
 }

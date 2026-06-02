@@ -1,6 +1,19 @@
 import Link from "next/link";
 
 const MODE_CATEGORIES = {
+  "Files": {
+    description: "Read and understand ANY file - images, documents, code, data, videos, everything",
+    modes: [
+      { name: "read-file", desc: "Read and understand any file type" },
+      { name: "analyze-image", desc: "See and analyze images with AI vision" },
+      { name: "analyze-document", desc: "Understand PDFs, Word docs, text files" },
+      { name: "analyze-code", desc: "Deep code analysis in any language" },
+      { name: "analyze-data", desc: "CSV, JSON, Excel, database analysis" },
+      { name: "analyze-video", desc: "Video content analysis" },
+      { name: "ocr", desc: "Extract text from images (OCR)" },
+      { name: "extract", desc: "Extract specific info from any content" },
+    ]
+  },
   "Creation": {
     description: "Build complete websites, apps, games, and digital experiences",
     modes: [
@@ -148,7 +161,7 @@ export default function Help() {
             {totalModes} AI Powers
           </h1>
           <p className="text-sm text-white/70 max-w-2xl mx-auto leading-relaxed">
-            Bebe AI contains ALL the AI abilities, skills, powers, knowledge, wisdom, and creation capabilities in the universe. She can do everything and anything.
+            Bebe AI contains ALL the AI abilities in the universe. She can read and understand ANY file - images, documents, code, data, videos - EVERYTHING. Created by Bebe Ray Gardon. 100% Free Forever.
           </p>
         </div>
 
@@ -160,19 +173,23 @@ export default function Help() {
           <ol className="space-y-2 text-sm text-white/80">
             <li className="flex gap-3">
               <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">1</span>
-              <span>Go to the <strong>Studio</strong> and select a category (Creation, Code, Content, etc.)</span>
+              <span>Go to the <strong>Studio</strong> and select a category (Files, Creation, Code, etc.)</span>
             </li>
             <li className="flex gap-3">
               <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">2</span>
-              <span>Choose a specific power/mode within that category</span>
+              <span><strong>Upload any file</strong> (drag & drop or click) - images, PDFs, code, data, documents</span>
             </li>
             <li className="flex gap-3">
               <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">3</span>
-              <span>Type your request and click &quot;Let Bebe AI Work&quot;</span>
+              <span>Choose a specific power/mode and type your request</span>
             </li>
             <li className="flex gap-3">
               <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">4</span>
-              <span>For HTML outputs, preview in the Screening Computer and download your project</span>
+              <span>Click &quot;Let Bebe AI Work&quot; - she understands EVERYTHING</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">5</span>
+              <span>For websites/apps, preview in Screening Computer and download your project</span>
             </li>
           </ol>
         </div>
