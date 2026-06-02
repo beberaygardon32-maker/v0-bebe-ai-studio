@@ -1,0 +1,57 @@
+Visitor
+   ↓
+Frontend (Vercel)
+   ↓
+API Route / Backend
+   ↓
+OpenAI API
+
+// app/api/chat/route.js
+
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function POST(req) {
+  try {
+    const { message } = await req.json();
+
+    const response = await openai.responses.create({
+      model: "gpt-5",
+      input: message,
+    });
+
+    return Response.json({
+      reply: response.output_text,
+    });
+
+  } catch (error) {
+    return Response.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+async function sendMessage(message) {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message })
+  });
+
+  const data = await res.json();
+
+  return data.reply;
+}
+
+OPENAI_API_KEY=your_new_api_key_here
+
+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
+
+Project Settings
+→ Environment Variables
