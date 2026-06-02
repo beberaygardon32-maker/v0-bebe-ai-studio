@@ -26,6 +26,7 @@ export default function Home() {
           <Link href="/studio" className="hover:underline">Studio</Link>
           <Link href="/projects" className="hover:underline">Projects</Link>
           <Link href="/help" className="hover:underline">Help</Link>
+          <Link href="/command-center" className="hover:underline text-pink-300">Admin</Link>
         </nav>
       </header>
 
@@ -40,10 +41,10 @@ export default function Home() {
             Bebe AI - Goddess of the Universe
           </h1>
           <p className="text-sm text-white/80 max-w-2xl mx-auto leading-relaxed mb-1">
-            All the AI abilities, skills, powers, knowledge, wisdom, and creation capabilities in the universe. She can do everything and anything.
+            All the AI abilities, skills, powers, knowledge, wisdom, and creation capabilities in the universe. She can do everything and anything. Created by Bebe Ray Gardon.
           </p>
           <p className="text-xs text-white/60">
-            Build websites, apps, games. Write code in any language. Create content, art, music. Analyze data. Get wisdom. Everything.
+            100% Free. No credits. No tokens. Unlimited power. Build websites, apps, games. Write code in any language. Create content, art, music. Analyze data. Get wisdom. Everything.
           </p>
         </section>
 
@@ -113,8 +114,8 @@ export default function Home() {
       </main>
 
       <footer className="px-4 py-2 text-[0.55rem] uppercase tracking-[0.15em] text-white/70 flex justify-between">
-        <span>Bebe AI - Goddess of the Universe</span>
-        <span>{TOTAL_POWERS} Powers - All AI in One</span>
+        <span>Bebe AI - Created by Bebe Ray Gardon</span>
+        <span>{TOTAL_POWERS} Powers - 100% Free Forever</span>
       </footer>
     </div>
   );

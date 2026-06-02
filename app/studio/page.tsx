@@ -206,9 +206,12 @@ export default function Studio() {
           <Link href="/projects" className="text-[0.55rem] uppercase tracking-[0.15em] hover:underline">
             Projects
           </Link>
+          <Link href="/command-center" className="text-[0.55rem] uppercase tracking-[0.15em] hover:underline text-pink-300">
+            Admin
+          </Link>
           <div className="flex items-center gap-1.5 text-[0.55rem] uppercase tracking-[0.15em]">
             <span className="inline-flex w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)] animate-pulse" />
-            <span>{ALL_MODES.length} Powers Active</span>
+            <span>Free Forever</span>
           </div>
         </div>
       </header>
