@@ -394,6 +394,7 @@ ${data.output || "// No output returned."}`);
             Form: {bebeForm} | {TOTAL_POWERS}+ Powers
           </span>
           <Link href="/help" className="text-[0.55rem] uppercase tracking-[0.15em] hover:underline">Help</Link>
+          <Link href="/download" className="text-[0.55rem] uppercase tracking-[0.15em] hover:underline text-emerald-300">App</Link>
           <Link href="/projects" className="text-[0.55rem] uppercase tracking-[0.15em] hover:underline">Projects</Link>
           <Link href="/command-center" className="text-[0.55rem] uppercase tracking-[0.15em] hover:underline text-pink-300">Admin</Link>
           <div className="flex items-center gap-1.5 text-[0.55rem] uppercase tracking-[0.15em]">

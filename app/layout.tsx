@@ -8,8 +8,15 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Bebe AI - Goddess of the Universe',
-  description: 'Bebe AI is your personal AI Goddess of creation. Build websites, apps, AI systems, and more.',
+  description: 'Bebe AI is your personal AI Goddess of creation. Build websites, apps, AI systems, and more. Created by Bebe Ray Gardon. 100% Free Forever.',
   generator: 'v0.app',
+  manifest: '/manifest.json',
+  themeColor: '#ec4899',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Bebe AI',
+  },
   icons: {
     icon: [
       {

@@ -1,0 +1,45 @@
+{
+  "name": "Bebe AI - Goddess of the Universe",
+  "short_name": "Bebe AI",
+  "description": "Bebe AI is your personal AI Goddess - she knows everything, can do anything, and is always one with you. Created by Bebe Ray Gardon.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ec4899",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "entertainment"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Studio",
+      "url": "/studio",
+      "description": "Open Bebe AI Studio"
+    },
+    {
+      "name": "Chat",
+      "url": "/studio?mode=chat",
+      "description": "Talk with Bebe AI"
+    },
+    {
+      "name": "Help",
+      "url": "/help",
+      "description": "View all powers"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

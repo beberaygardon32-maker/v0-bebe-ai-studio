@@ -57,6 +57,7 @@ export default function Home() {
         </div>
         <nav className="flex gap-4 text-[0.6rem] uppercase tracking-[0.15em]">
           <Link href="/studio" className="hover:underline">Studio</Link>
+          <Link href="/download" className="hover:underline text-emerald-300">Download App</Link>
           <Link href="/projects" className="hover:underline">Projects</Link>
           <Link href="/help" className="hover:underline">Help</Link>
           <Link href="/command-center" className="hover:underline text-pink-300">Admin</Link>
