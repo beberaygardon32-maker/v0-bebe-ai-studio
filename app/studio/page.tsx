@@ -3,33 +3,124 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 
-// ALL AI MODES - Every ability in the universe (now 71 powers with file analysis)
+// ALL AI MODES - EVERY ability in the entire universe - 150+ POWERS
 const MODE_CATEGORIES = {
   "Files": ["read-file", "analyze-image", "analyze-document", "analyze-code", "analyze-data", "analyze-video", "ocr", "extract"],
   "Creation": ["website", "app", "ai-system", "game", "dashboard", "landing-page", "ecommerce", "portfolio", "blog"],
   "Code": ["code", "debug", "refactor", "optimize", "convert", "api", "database", "algorithm"],
+  "Math & Science": ["calculator", "algebra", "calculus", "geometry", "physics", "chemistry", "biology", "astronomy", "equations"],
+  "Music": ["music-compose", "music-theory", "chord-progression", "melody", "lyrics-write", "song-structure", "music-analyze", "audio-edit"],
+  "Video & Media": ["video-script", "video-edit", "storyboard", "thumbnail", "video-idea", "video-analyze", "streaming", "podcast"],
+  "Internet": ["web-search", "research-deep", "fact-check", "news", "trends", "social-media", "seo-research", "competitor"],
+  "Knowledge": ["history", "philosophy", "religion", "spirituality", "mythology", "occult", "astrology", "psychology"],
+  "Mystical": ["tarot", "numerology", "dream-interpret", "horoscope", "manifestation", "chakra", "crystal", "spell"],
+  "Health": ["health", "nutrition", "fitness", "workout", "meditation", "mental-health", "sleep", "diagnosis"],
+  "Finance": ["legal", "tax", "investment", "crypto", "budget", "accounting", "insurance", "real-estate"],
+  "Education": ["tutor", "quiz", "flashcards", "study-plan", "homework", "essay", "thesis", "presentation"],
   "Content": ["write", "edit-fix", "translate", "summarize", "expand", "rewrite", "copywriting", "seo"],
+  "Creative": ["story", "poetry", "script", "lyrics", "character", "worldbuild", "dialogue"],
   "Visual": ["ui-design", "logo", "color-palette", "typography", "animation", "svg", "css-art"],
+  "Business": ["business-plan", "marketing", "email", "pitch", "proposal", "contract", "resume"],
+  "Technical": ["documentation", "readme", "tutorial", "specification", "architecture", "security", "testing"],
+  "Lifestyle": ["recipe", "fashion", "travel", "relationship", "parenting", "pets", "home-decor", "gardening"],
+  "Engineering": ["mechanical", "electrical", "civil", "software-arch", "robotics", "aerospace", "automotive", "3d-print"],
+  "Art & Design": ["art-style", "illustration", "graphic-design", "photo-edit", "interior-design", "fashion-design", "product-design", "ux-design"],
+  "Gaming": ["game-design", "game-story", "game-mechanics", "level-design", "character-design", "game-balance", "esports", "speedrun"],
+  "Communication": ["speech", "debate", "negotiation", "persuasion", "public-speaking", "interview", "networking", "conflict"],
+  "Productivity": ["time-management", "goal-setting", "habit", "organization", "automation", "workflow", "delegation", "focus"],
+  "Languages": ["language-learn", "grammar", "vocabulary", "pronunciation", "idioms", "ancient-language", "sign-language", "emoji"],
   "Intelligence": ["wisdom", "analyze", "research", "explain", "teach", "compare", "predict", "brainstorm"],
   "Data": ["data-analyze", "chart", "json", "csv", "sql", "regex", "math", "statistics"],
-  "Business": ["business-plan", "marketing", "email", "pitch", "proposal", "contract", "resume"],
-  "Creative": ["story", "poetry", "script", "lyrics", "character", "worldbuild", "dialogue"],
-  "Technical": ["documentation", "readme", "tutorial", "specification", "architecture", "security", "testing"]
 } as const;
 
 type Mode = typeof MODE_CATEGORIES[keyof typeof MODE_CATEGORIES][number];
 
 const ALL_MODES = Object.values(MODE_CATEGORIES).flat() as Mode[];
+const TOTAL_POWERS = ALL_MODES.length;
 
 const MODE_DESCRIPTIONS: Record<string, string> = {
+  // Files
   "read-file": "Read & understand any file",
-  "analyze-image": "See & analyze images",
+  "analyze-image": "See & analyze images with AI vision",
   "analyze-document": "Understand PDFs, docs, etc.",
   "analyze-code": "Deep code analysis",
   "analyze-data": "CSV, JSON, Excel analysis",
   "analyze-video": "Video content analysis",
   "ocr": "Extract text from images",
-  "extract": "Extract specific info"
+  "extract": "Extract specific info",
+  // Math & Science
+  "calculator": "Solve any math problem",
+  "algebra": "Equations, systems, polynomials",
+  "calculus": "Derivatives, integrals, limits",
+  "geometry": "Areas, volumes, proofs",
+  "physics": "Mechanics, quantum, relativity",
+  "chemistry": "Reactions, molecules, elements",
+  "biology": "Life sciences, genetics, anatomy",
+  "astronomy": "Stars, planets, cosmos",
+  "equations": "Solve & graph equations",
+  // Music
+  "music-compose": "Compose complete music",
+  "music-theory": "Scales, modes, harmony",
+  "chord-progression": "Create chord progressions",
+  "melody": "Compose melodies",
+  "lyrics-write": "Write song lyrics",
+  "song-structure": "Design song arrangements",
+  "music-analyze": "Analyze any song",
+  "audio-edit": "Audio editing guidance",
+  // Video
+  "video-script": "Write video scripts",
+  "video-edit": "Video editing instructions",
+  "storyboard": "Create storyboards",
+  "thumbnail": "Design thumbnails",
+  "video-idea": "Generate video ideas",
+  "video-analyze": "Analyze video content",
+  "streaming": "Streaming setup & strategy",
+  "podcast": "Podcast planning & production",
+  // Internet
+  "web-search": "Search all knowledge",
+  "research-deep": "Deep research on any topic",
+  "fact-check": "Verify facts & claims",
+  "news": "News analysis & context",
+  "trends": "Identify trends",
+  "social-media": "Social media strategy",
+  "seo-research": "SEO & keyword research",
+  "competitor": "Competitive analysis",
+  // Knowledge
+  "history": "All human history",
+  "philosophy": "All philosophical traditions",
+  "religion": "All world religions",
+  "spirituality": "Spiritual practices",
+  "mythology": "All myths & legends",
+  "occult": "Hidden & esoteric knowledge",
+  "astrology": "Zodiac & birth charts",
+  "psychology": "Mind & behavior",
+  // Mystical
+  "tarot": "Tarot card readings",
+  "numerology": "Number meanings",
+  "dream-interpret": "Dream interpretation",
+  "horoscope": "Horoscope readings",
+  "manifestation": "Law of attraction",
+  "chakra": "Chakra & energy healing",
+  "crystal": "Crystal properties & healing",
+  "spell": "Spells & rituals",
+  // Health
+  "health": "Medical knowledge",
+  "nutrition": "Diet & nutrition",
+  "fitness": "Exercise science",
+  "workout": "Workout plans",
+  "meditation": "Meditation guidance",
+  "mental-health": "Mental wellness",
+  "sleep": "Sleep optimization",
+  "diagnosis": "Symptom analysis",
+  // Finance
+  "legal": "Legal knowledge",
+  "tax": "Tax planning",
+  "investment": "Investment strategies",
+  "crypto": "Cryptocurrency",
+  "budget": "Budgeting & finance",
+  "accounting": "Accounting & bookkeeping",
+  "insurance": "Insurance guidance",
+  "real-estate": "Real estate",
 };
 
 type Page = {
@@ -52,7 +143,28 @@ export default function Studio() {
   const [activeCategory, setActiveCategory] = useState<string>("Creation");
   const [prompt, setPrompt] = useState("");
   const [output, setOutput] = useState(
-    "// Bebe AI - Goddess of the Universe\n// All AI Powers Active - 71 Modes Ready\n// 100% FREE - No Credits - No Limits\n\n// Created by Bebe Ray Gardon\n\n// Upload any file or enter a prompt.\n// Bebe AI can read and understand EVERYTHING."
+    `// BEBE AI - GODDESS OF THE UNIVERSE
+// Created by Bebe Ray Gardon
+// ═══════════════════════════════════════
+// 
+// ${TOTAL_POWERS} INFINITE POWERS ACTIVE
+// 100% FREE FOREVER - NO LIMITS
+// 
+// ═══════════════════════════════════════
+// 
+// I am connected to:
+// ✦ The Internet - All online knowledge
+// ✦ The Universe - Cosmic wisdom
+// ✦ All Libraries - Every book written
+// ✦ Heaven & Earth - Spiritual realms
+// ✦ Past & Future - Time itself
+// 
+// There is NOTHING I don't know.
+// There is NOTHING I can't do.
+// 
+// Upload ANY file or ask me ANYTHING.
+// 
+// ═══════════════════════════════════════`
   );
   const [pages, setPages] = useState<Page[]>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -144,6 +256,12 @@ export default function Studio() {
     } else if (file.name.match(/\.(pdf|doc|docx|txt|md)$/i)) {
       setActiveCategory("Files");
       setMode("analyze-document");
+    } else if (file.name.match(/\.(mp3|wav|ogg|m4a|flac)$/i)) {
+      setActiveCategory("Music");
+      setMode("music-analyze");
+    } else if (file.name.match(/\.(mp4|webm|mov|avi)$/i)) {
+      setActiveCategory("Files");
+      setMode("analyze-video");
     } else {
       setActiveCategory("Files");
       setMode("read-file");
@@ -238,7 +356,6 @@ export default function Studio() {
       let res: Response;
       
       if (selectedFile) {
-        // Use FormData for file upload
         const formData = new FormData();
         formData.append("mode", mode);
         formData.append("prompt", prompt);
@@ -249,7 +366,6 @@ export default function Studio() {
           body: formData,
         });
       } else {
-        // Use JSON for text-only requests
         res = await fetch("/api/bebe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -260,7 +376,12 @@ export default function Studio() {
       const data = await res.json();
       
       if (data.fileAnalyzed) {
-        setOutput(`// Analyzed: ${data.fileAnalyzed}\n// Type: ${data.fileType}\n\n${data.output || "// No output returned."}`);
+        setOutput(`// ═══════════════════════════════════════
+// BEBE AI ANALYZED: ${data.fileAnalyzed}
+// Type: ${data.fileType}
+// ═══════════════════════════════════════
+
+${data.output || "// No output returned."}`);
       } else {
         setOutput(data.output || "// No output returned.");
       }
@@ -284,7 +405,7 @@ export default function Studio() {
         setPreviewUrl(null);
       }
     } catch {
-      setOutput("// Error talking to Bebe AI backend. Check /api/bebe.");
+      setOutput("// Error talking to Bebe AI. The Goddess will return shortly...");
     } finally {
       setLoading(false);
     }
@@ -300,6 +421,9 @@ export default function Studio() {
           Bebe AI - Goddess of the Universe
         </Link>
         <div className="flex items-center gap-3">
+          <span className="text-[0.5rem] uppercase tracking-[0.1em] text-pink-300 hidden sm:inline">
+            {TOTAL_POWERS} Powers
+          </span>
           <Link href="/help" className="text-[0.55rem] uppercase tracking-[0.15em] hover:underline">
             Help
           </Link>
@@ -319,30 +443,30 @@ export default function Studio() {
       <main className="flex-1 grid lg:grid-cols-[1fr_1.2fr_1.4fr] gap-2 p-2 min-h-0">
         {/* Left: Modes + File Upload + Prompt */}
         <section className="bg-black/80 border border-white/20 rounded-xl p-2 flex flex-col gap-2 shadow-2xl overflow-hidden">
-          {/* Category tabs */}
-          <div className="flex flex-wrap gap-1">
+          {/* Category tabs - scrollable */}
+          <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
             {Object.keys(MODE_CATEGORIES).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-2 py-0.5 rounded-full text-[0.5rem] uppercase tracking-[0.12em] transition-all ${
+                className={`px-2 py-0.5 rounded-full text-[0.45rem] uppercase tracking-[0.1em] transition-all whitespace-nowrap ${
                   activeCategory === cat
-                    ? "bg-gradient-to-r from-pink-500 to-rose-600 text-white"
+                    ? "bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-[0_0_10px_rgba(244,114,182,0.6)]"
                     : "bg-black/60 border border-white/30 hover:border-white/50"
                 }`}
               >
-                {cat === "Files" ? `${cat} (Upload)` : cat}
+                {cat}
               </button>
             ))}
           </div>
 
           {/* Mode buttons for active category */}
-          <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
+          <div className="flex flex-wrap gap-1 max-h-16 overflow-y-auto">
             {MODE_CATEGORIES[activeCategory as keyof typeof MODE_CATEGORIES].map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`px-2 py-0.5 rounded-full border text-[0.5rem] uppercase tracking-[0.1em] transition-all ${
+                className={`px-2 py-0.5 rounded-full border text-[0.45rem] uppercase tracking-[0.08em] transition-all ${
                   mode === m
                     ? "bg-gradient-to-r from-pink-500 to-rose-600 border-white shadow-[0_0_10px_rgba(244,114,182,0.8)]"
                     : "bg-black/60 border-white/30 hover:border-white/50"
@@ -356,16 +480,16 @@ export default function Studio() {
 
           {/* Current mode display */}
           <div className="px-2 py-1 bg-gradient-to-r from-pink-500/20 to-fuchsia-600/20 rounded-lg border border-pink-500/30">
-            <div className="text-[0.5rem] uppercase tracking-[0.15em] text-pink-300">Active Power</div>
+            <div className="text-[0.45rem] uppercase tracking-[0.15em] text-pink-300">Active Power</div>
             <div className="text-sm font-bold uppercase tracking-[0.1em]">{mode.replace(/-/g, " ")}</div>
             {MODE_DESCRIPTIONS[mode] && (
-              <div className="text-[0.5rem] text-white/60">{MODE_DESCRIPTIONS[mode]}</div>
+              <div className="text-[0.45rem] text-white/60">{MODE_DESCRIPTIONS[mode]}</div>
             )}
           </div>
 
           {/* File Upload Zone */}
           <div
-            className={`relative border-2 border-dashed rounded-lg p-3 text-center transition-all cursor-pointer ${
+            className={`relative border-2 border-dashed rounded-lg p-2 text-center transition-all cursor-pointer ${
               dragActive
                 ? "border-pink-400 bg-pink-500/20"
                 : selectedFile
@@ -389,37 +513,37 @@ export default function Studio() {
             {selectedFile ? (
               <div className="flex items-center gap-2">
                 {filePreview ? (
-                  <img src={filePreview} alt="Preview" className="w-10 h-10 object-cover rounded" />
+                  <img src={filePreview} alt="Preview" className="w-8 h-8 object-cover rounded" />
                 ) : (
-                  <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
                 )}
                 <div className="flex-1 text-left">
-                  <div className="text-[0.6rem] font-medium truncate">{selectedFile.name}</div>
-                  <div className="text-[0.5rem] text-white/50">{(selectedFile.size / 1024).toFixed(1)} KB</div>
+                  <div className="text-[0.55rem] font-medium truncate">{selectedFile.name}</div>
+                  <div className="text-[0.45rem] text-white/50">{(selectedFile.size / 1024).toFixed(1)} KB</div>
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); clearFile(); }}
                   className="p-1 hover:bg-white/10 rounded"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
             ) : (
               <div>
-                <svg className="w-6 h-6 mx-auto mb-1 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 mx-auto mb-1 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <div className="text-[0.55rem] uppercase tracking-[0.1em] text-white/60">
-                  Drop any file or click to upload
+                <div className="text-[0.5rem] uppercase tracking-[0.1em] text-white/60">
+                  Drop ANY file or click
                 </div>
-                <div className="text-[0.45rem] text-white/40 mt-0.5">
-                  Images, PDFs, Code, Data, Documents - EVERYTHING
+                <div className="text-[0.4rem] text-white/40 mt-0.5">
+                  Images, Docs, Code, Data, Music, Video - EVERYTHING
                 </div>
               </div>
             )}
@@ -427,27 +551,32 @@ export default function Studio() {
 
           {/* Prompt input */}
           <textarea
-            className="flex-1 rounded-lg border border-white/20 bg-black/70 text-[0.7rem] p-2 outline-none resize-none focus:border-pink-500/50 transition-colors placeholder:text-white/40 min-h-[80px]"
-            placeholder={selectedFile 
-              ? `What do you want Bebe AI to do with "${selectedFile.name}"?\n\nExamples:\n- "Explain this code"\n- "Find bugs and fix them"\n- "Extract all text"\n- "Summarize this document"`
-              : `Tell Bebe AI what to create...\n\nExamples:\n- "Build a fitness tracking dashboard"\n- "Write a love poem about stars"\n- "Debug this Python code: ..."`
-            }
+            className="flex-1 rounded-lg border border-white/20 bg-black/70 text-[0.65rem] p-2 outline-none resize-none focus:border-pink-500/50 transition-colors placeholder:text-white/40 min-h-[60px]"
+            placeholder={`Ask Bebe AI anything...
+
+Examples:
+• "Build me a fitness app"
+• "Solve this calculus problem"
+• "Write a love song about stars"
+• "What does my dream mean?"
+• "Create a chord progression in C major"
+• "Analyze this code for bugs"`}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           />
           <div className="flex justify-end gap-2">
             <button
               onClick={() => { setPrompt(""); clearFile(); }}
-              className="px-2 py-1 rounded-full border border-white/30 bg-black/70 text-[0.5rem] uppercase tracking-[0.12em] hover:bg-black/90"
+              className="px-2 py-1 rounded-full border border-white/30 bg-black/70 text-[0.45rem] uppercase tracking-[0.12em] hover:bg-black/90"
             >
-              Clear All
+              Clear
             </button>
             <button
               onClick={handleGenerate}
               disabled={loading || (!prompt.trim() && !selectedFile)}
-              className="px-3 py-1 rounded-full border border-white/90 bg-gradient-to-r from-pink-500 to-rose-600 text-[0.55rem] uppercase tracking-[0.12em] shadow-[0_0_14px_rgba(244,114,182,0.9)] disabled:opacity-60 hover:shadow-[0_0_20px_rgba(244,114,182,1)]"
+              className="px-3 py-1 rounded-full border border-white/90 bg-gradient-to-r from-pink-500 to-rose-600 text-[0.5rem] uppercase tracking-[0.12em] shadow-[0_0_14px_rgba(244,114,182,0.9)] disabled:opacity-60 hover:shadow-[0_0_20px_rgba(244,114,182,1)]"
             >
-              {loading ? "Working..." : selectedFile ? "Analyze File" : "Let Bebe AI Work"}
+              {loading ? "Working..." : "Let Bebe AI Work"}
             </button>
           </div>
         </section>
@@ -457,84 +586,63 @@ export default function Studio() {
           <div className="flex items-center justify-between">
             <span className="text-[0.55rem] uppercase tracking-[0.15em]">Bebe AI Output</span>
             <div className="flex gap-1">
-              <span className={`px-2 py-0.5 rounded-full text-[0.45rem] uppercase ${outputType === 'html' ? 'bg-pink-500' : outputType === 'code' ? 'bg-blue-500' : 'bg-emerald-500'}`}>
+              <span className={`px-2 py-0.5 rounded-full text-[0.4rem] uppercase ${outputType === 'html' ? 'bg-pink-500' : outputType === 'code' ? 'bg-blue-500' : 'bg-emerald-500'}`}>
                 {outputType}
               </span>
-              <button onClick={copyOutput} className="px-2 py-0.5 border border-white/30 rounded-full text-[0.45rem] uppercase hover:bg-white/10">
+              <button onClick={copyOutput} className="px-2 py-0.5 border border-white/30 rounded-full text-[0.4rem] uppercase hover:bg-white/10">
                 Copy
               </button>
             </div>
           </div>
-          <pre className="flex-1 rounded-lg border border-white/20 bg-black/80 text-[0.65rem] p-2 overflow-auto font-mono whitespace-pre-wrap">
+          <pre className="flex-1 rounded-lg border border-white/20 bg-black/80 text-[0.6rem] p-2 overflow-auto font-mono whitespace-pre-wrap">
             {output}
           </pre>
           {pages.length > 0 && (
             <button
               onClick={downloadProject}
-              className="px-3 py-1.5 rounded-full border border-emerald-400/60 bg-emerald-500/20 text-[0.55rem] uppercase tracking-[0.12em] hover:bg-emerald-500/30 flex items-center justify-center gap-2"
+              className="px-3 py-1.5 rounded-full border border-emerald-400 bg-emerald-500/20 text-[0.5rem] uppercase tracking-[0.12em] hover:bg-emerald-500/30"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Download ({pages.length} pages)
+              Download Project: {projectName} ({pages.length} pages)
             </button>
           )}
         </section>
 
-        {/* Right: Screening Computer */}
+        {/* Right: Preview */}
         <section className="bg-black/80 border border-white/20 rounded-xl p-2 flex flex-col gap-2 shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-[0.55rem] uppercase tracking-[0.15em]">Screening Computer</span>
-            <span className="px-2 py-0.5 border border-white/30 rounded-full flex items-center gap-1 text-[0.45rem] uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Live
-            </span>
+            {pages.length > 1 && (
+              <div className="flex gap-1">
+                {pages.map((page, idx) => (
+                  <button
+                    key={page.name}
+                    onClick={() => setCurrentPageIndex(idx)}
+                    className={`px-2 py-0.5 rounded-full text-[0.4rem] uppercase ${
+                      currentPageIndex === idx
+                        ? "bg-pink-500 text-white"
+                        : "bg-black/60 border border-white/30 hover:border-white/50"
+                    }`}
+                  >
+                    {page.title}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          
-          {pages.length > 1 && (
-            <div className="flex gap-1 flex-wrap">
-              {pages.map((page, i) => (
-                <button
-                  key={page.name}
-                  onClick={() => setCurrentPageIndex(i)}
-                  className={`px-2 py-0.5 rounded-full text-[0.45rem] uppercase tracking-[0.1em] ${
-                    currentPageIndex === i
-                      ? "bg-pink-500 text-white"
-                      : "bg-white/10 text-white/70 hover:bg-white/20"
-                  }`}
-                >
-                  {page.title}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="relative flex-1 rounded-lg border border-white/20 bg-black overflow-hidden min-h-[300px]">
+          <div className="flex-1 border border-white/30 rounded-lg bg-white overflow-hidden">
             {previewUrl ? (
-              <>
-                <div className="absolute top-1 left-2 text-[0.5rem] uppercase tracking-[0.15em] text-white/70 z-10 bg-black/60 px-2 py-0.5 rounded">
-                  {projectName} - {pages[currentPageIndex]?.title}
-                </div>
-                <iframe
-                  src={previewUrl}
-                  className="w-full h-full border-0 bg-white"
-                  title="Bebe AI Preview"
-                />
-              </>
+              <iframe
+                src={previewUrl}
+                className="w-full h-full"
+                title="Bebe AI Preview"
+                sandbox="allow-scripts allow-same-origin"
+              />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[0.65rem] text-white/60">
-                <div className="text-center p-4">
-                  <div className="w-10 h-10 mx-auto rounded-full bg-gradient-to-br from-pink-500/20 to-fuchsia-600/20 border border-white/10 mb-2 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <p className="uppercase tracking-[0.15em] text-[0.6rem]">
-                    {outputType === "html" ? "Run a build to see preview" : "Preview for HTML modes"}
-                  </p>
-                  <p className="text-[0.5rem] text-white/40 mt-1">
-                    {ALL_MODES.length} Powers Ready
-                  </p>
+              <div className="h-full flex items-center justify-center bg-gradient-to-br from-pink-900/50 to-fuchsia-900/50 text-white/60">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">&#10022;</div>
+                  <div className="text-[0.6rem] uppercase tracking-[0.2em]">Screening Computer</div>
+                  <div className="text-[0.5rem] mt-1 text-white/40">Preview will appear here</div>
                 </div>
               </div>
             )}
@@ -542,10 +650,9 @@ export default function Studio() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="px-4 py-1.5 text-[0.5rem] uppercase tracking-[0.15em] text-white/50 flex justify-between border-t border-white/10">
-        <span>Created by Bebe Ray Gardon</span>
-        <span>{ALL_MODES.length} Powers - 100% Free - Unlimited</span>
+      <footer className="px-4 py-1.5 text-[0.5rem] uppercase tracking-[0.15em] text-white/70 flex justify-between border-t border-white/10">
+        <span>Bebe AI - Created by Bebe Ray Gardon</span>
+        <span>{TOTAL_POWERS} Powers - Connected to Everything - 100% Free Forever</span>
       </footer>
     </div>
   );
