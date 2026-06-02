@@ -1,74 +1,125 @@
 import Link from "next/link";
 
-const FEATURES = [
-  {
-    title: "Website Mode",
-    description:
-      "Build complete, luxury-styled websites with bold colors, clean layouts, and stunning visuals.",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-      />
-    ),
+const MODE_CATEGORIES = {
+  "Creation": {
+    description: "Build complete websites, apps, games, and digital experiences",
+    modes: [
+      { name: "website", desc: "Multi-page websites with navigation and luxury styling" },
+      { name: "app", desc: "Interactive web applications with forms and state" },
+      { name: "ai-system", desc: "AI-powered interfaces and intelligent systems" },
+      { name: "game", desc: "Browser games with Canvas/DOM, controls, scoring" },
+      { name: "dashboard", desc: "Admin panels with charts, metrics, analytics" },
+      { name: "landing-page", desc: "High-converting single pages with CTAs" },
+      { name: "ecommerce", desc: "Online stores with products, cart, checkout" },
+      { name: "portfolio", desc: "Showcase work with stunning galleries" },
+      { name: "blog", desc: "Blog platforms with posts and categories" },
+    ]
   },
-  {
-    title: "App Mode",
-    description:
-      "Create interactive applications with forms, buttons, and dynamic elements.",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-      />
-    ),
+  "Code": {
+    description: "Write, fix, optimize, and transform code in any language",
+    modes: [
+      { name: "code", desc: "Production-ready code in ANY programming language" },
+      { name: "debug", desc: "Find and fix bugs, errors, and issues" },
+      { name: "refactor", desc: "Clean up code for maintainability" },
+      { name: "optimize", desc: "Improve speed, memory, performance" },
+      { name: "convert", desc: "Transform code between languages/frameworks" },
+      { name: "api", desc: "Design REST, GraphQL, WebSocket APIs" },
+      { name: "database", desc: "Schemas, queries, SQL/NoSQL optimization" },
+      { name: "algorithm", desc: "Solve problems with optimal algorithms" },
+    ]
   },
-  {
-    title: "AI System Mode",
-    description:
-      "Design AI-powered interfaces and intelligent system architectures.",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-      />
-    ),
+  "Content": {
+    description: "Write, edit, translate, and transform any text content",
+    modes: [
+      { name: "write", desc: "Articles, blogs, scripts, social posts, ads" },
+      { name: "edit-fix", desc: "Fix grammar, improve clarity, polish text" },
+      { name: "translate", desc: "Translate between 100+ languages" },
+      { name: "summarize", desc: "Condense content while keeping key points" },
+      { name: "expand", desc: "Turn outlines into detailed content" },
+      { name: "rewrite", desc: "Change style/tone while keeping meaning" },
+      { name: "copywriting", desc: "Persuasive copy that converts" },
+      { name: "seo", desc: "Optimize content for search engines" },
+    ]
   },
-  {
-    title: "Edit/Fix Mode",
-    description:
-      "Improve, clean, and fix any text or code you provide. Bebe AI makes it perfect.",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-      />
-    ),
+  "Visual": {
+    description: "Design UIs, logos, colors, typography, and animations",
+    modes: [
+      { name: "ui-design", desc: "UI specifications and design systems" },
+      { name: "logo", desc: "SVG logos with multiple variations" },
+      { name: "color-palette", desc: "Perfect color schemes with hex/RGB/HSL" },
+      { name: "typography", desc: "Font pairings and type systems" },
+      { name: "animation", desc: "CSS/JS animations and micro-interactions" },
+      { name: "svg", desc: "Vector graphics, icons, illustrations" },
+      { name: "css-art", desc: "Stunning art using pure CSS" },
+    ]
   },
-  {
-    title: "Wisdom Mode",
-    description:
-      "Get goddess-level guidance, strategy, and step-by-step insights for any challenge.",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-      />
-    ),
+  "Intelligence": {
+    description: "Get wisdom, analysis, research, and strategic guidance",
+    modes: [
+      { name: "wisdom", desc: "Deep guidance and life strategy" },
+      { name: "analyze", desc: "Break down anything into insights" },
+      { name: "research", desc: "Comprehensive topic research" },
+      { name: "explain", desc: "Make complex topics simple" },
+      { name: "teach", desc: "Lessons, exercises, learning paths" },
+      { name: "compare", desc: "Objective comparisons and decisions" },
+      { name: "predict", desc: "Trend analysis and forecasting" },
+      { name: "brainstorm", desc: "Generate creative ideas without limits" },
+    ]
   },
-];
+  "Data": {
+    description: "Analyze data, create charts, work with SQL, JSON, and more",
+    modes: [
+      { name: "data-analyze", desc: "Extract insights from datasets" },
+      { name: "chart", desc: "Charts and data visualizations" },
+      { name: "json", desc: "Parse, format, transform JSON" },
+      { name: "csv", desc: "Work with CSV and tabular data" },
+      { name: "sql", desc: "Perfect SQL queries for any database" },
+      { name: "regex", desc: "Pattern matching with regex" },
+      { name: "math", desc: "Solve any math problem" },
+      { name: "statistics", desc: "Statistical analysis and probability" },
+    ]
+  },
+  "Business": {
+    description: "Business plans, marketing, emails, pitches, and professional docs",
+    modes: [
+      { name: "business-plan", desc: "Comprehensive business plans" },
+      { name: "marketing", desc: "Marketing strategies and campaigns" },
+      { name: "email", desc: "Professional email writing" },
+      { name: "pitch", desc: "Investor and sales pitches" },
+      { name: "proposal", desc: "Winning project proposals" },
+      { name: "contract", desc: "Contracts and legal documents" },
+      { name: "resume", desc: "ATS-optimized resumes and CVs" },
+    ]
+  },
+  "Creative": {
+    description: "Stories, poetry, scripts, lyrics, and worldbuilding",
+    modes: [
+      { name: "story", desc: "Captivating narratives and fiction" },
+      { name: "poetry", desc: "Beautiful verse in any style" },
+      { name: "script", desc: "Screenplays and scripts" },
+      { name: "lyrics", desc: "Song lyrics for any genre" },
+      { name: "character", desc: "Deep character development" },
+      { name: "worldbuild", desc: "Immersive fictional universes" },
+      { name: "dialogue", desc: "Natural, compelling conversations" },
+    ]
+  },
+  "Technical": {
+    description: "Documentation, specifications, architecture, and testing",
+    modes: [
+      { name: "documentation", desc: "Clear technical docs and guides" },
+      { name: "readme", desc: "Perfect project READMEs" },
+      { name: "tutorial", desc: "Step-by-step learning guides" },
+      { name: "specification", desc: "Detailed technical specs" },
+      { name: "architecture", desc: "System design and diagrams" },
+      { name: "security", desc: "Security analysis and hardening" },
+      { name: "testing", desc: "Comprehensive test suites" },
+    ]
+  },
+};
 
 export default function Help() {
+  const totalModes = Object.values(MODE_CATEGORIES).reduce((acc, cat) => acc + cat.modes.length, 0);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-500 via-fuchsia-900 to-black text-white flex flex-col">
       <header className="flex items-center justify-between px-6 py-3 border-b border-white/20 bg-black/40 backdrop-blur">
@@ -76,122 +127,95 @@ export default function Help() {
           href="/"
           className="uppercase tracking-[0.2em] text-xs font-bold hover:text-pink-300 transition-colors"
         >
-          Bebe AI • Help
+          Bebe AI - Help
         </Link>
         <div className="flex items-center gap-4">
-          <Link
-            href="/studio"
-            className="text-[0.6rem] uppercase tracking-[0.18em] hover:underline"
-          >
+          <Link href="/studio" className="text-[0.6rem] uppercase tracking-[0.18em] hover:underline">
             Studio
           </Link>
-          <Link
-            href="/projects"
-            className="text-[0.6rem] uppercase tracking-[0.18em] hover:underline"
-          >
+          <Link href="/projects" className="text-[0.6rem] uppercase tracking-[0.18em] hover:underline">
             Projects
           </Link>
         </div>
       </header>
 
-      <main className="flex-1 p-6 max-w-4xl mx-auto w-full">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center px-3 py-1 border border-white/40 rounded-full text-[0.6rem] uppercase tracking-[0.2em] bg-black/40 mb-4">
-            Bebe AI • Guide
+      <main className="flex-1 p-4 max-w-6xl mx-auto w-full overflow-y-auto">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center px-3 py-1 border border-white/40 rounded-full text-[0.6rem] uppercase tracking-[0.2em] bg-black/40 mb-3">
+            Bebe AI - Goddess of the Universe
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold uppercase tracking-[0.22em] mb-3">
-            How to Use Bebe AI
+          <h1 className="text-xl md:text-2xl font-extrabold uppercase tracking-[0.2em] mb-2">
+            {totalModes} AI Powers
           </h1>
-          <p className="text-sm text-white/70 max-w-xl mx-auto leading-relaxed">
-            Bebe AI is your personal goddess of creation. She builds, fixes, and
-            guides you through anything digital. Here&apos;s how to command her
-            powers.
+          <p className="text-sm text-white/70 max-w-2xl mx-auto leading-relaxed">
+            Bebe AI contains ALL the AI abilities, skills, powers, knowledge, wisdom, and creation capabilities in the universe. She can do everything and anything.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4 mb-10">
-          {FEATURES.map((feature) => (
-            <div
-              key={feature.title}
-              className="bg-black/60 border border-white/20 rounded-2xl p-5 hover:border-pink-500/50 transition-colors"
-            >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500/20 to-fuchsia-600/20 border border-white/10 mb-3 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-pink-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  {feature.icon}
-                </svg>
-              </div>
-              <h3 className="text-sm font-bold uppercase tracking-[0.15em] mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-xs text-white/70 leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-black/60 border border-white/20 rounded-2xl p-6 mb-6">
-          <h2 className="text-sm font-bold uppercase tracking-[0.15em] mb-4">
-            Getting Started
+        {/* Getting Started */}
+        <div className="bg-black/60 border border-white/20 rounded-2xl p-5 mb-6">
+          <h2 className="text-sm font-bold uppercase tracking-[0.15em] mb-3">
+            How to Use Bebe AI
           </h2>
-          <ol className="space-y-3 text-sm text-white/80">
+          <ol className="space-y-2 text-sm text-white/80">
             <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.65rem] font-bold flex-shrink-0">
-                1
-              </span>
-              <span>
-                Go to the <strong>Studio</strong> and select your mode
-                (Website, App, AI System, Edit/Fix, or Wisdom).
-              </span>
+              <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">1</span>
+              <span>Go to the <strong>Studio</strong> and select a category (Creation, Code, Content, etc.)</span>
             </li>
             <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.65rem] font-bold flex-shrink-0">
-                2
-              </span>
-              <span>
-                Type your request in the prompt box. Be specific about what you
-                want.
-              </span>
+              <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">2</span>
+              <span>Choose a specific power/mode within that category</span>
             </li>
             <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.65rem] font-bold flex-shrink-0">
-                3
-              </span>
-              <span>
-                Click <strong>&quot;Let Bebe AI Work&quot;</strong> and watch
-                the magic happen in the Screening Computer.
-              </span>
+              <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">3</span>
+              <span>Type your request and click &quot;Let Bebe AI Work&quot;</span>
             </li>
             <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.65rem] font-bold flex-shrink-0">
-                4
-              </span>
-              <span>
-                All your creations are saved in <strong>Projects</strong> for
-                future reference.
-              </span>
+              <span className="w-5 h-5 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-[0.6rem] font-bold flex-shrink-0">4</span>
+              <span>For HTML outputs, preview in the Screening Computer and download your project</span>
             </li>
           </ol>
         </div>
 
-        <div className="text-center">
+        {/* All Categories and Modes */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Object.entries(MODE_CATEGORIES).map(([category, data]) => (
+            <div key={category} className="bg-black/60 border border-white/20 rounded-xl p-4 hover:border-pink-500/30 transition-colors">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                  <span className="text-[0.6rem] font-bold">{data.modes.length}</span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-[0.12em]">{category}</h3>
+                </div>
+              </div>
+              <p className="text-[0.65rem] text-white/60 mb-3">{data.description}</p>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                {data.modes.map((mode) => (
+                  <div key={mode.name} className="flex gap-2 text-[0.6rem]">
+                    <span className="text-pink-400 uppercase font-semibold min-w-[80px]">{mode.name.replace(/-/g, " ")}</span>
+                    <span className="text-white/50">{mode.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div className="text-center mt-8">
           <Link
             href="/studio"
-            className="inline-block px-8 py-3 rounded-full border border-white/90 bg-gradient-to-r from-pink-500 to-rose-600 text-[0.75rem] uppercase tracking-[0.2em] shadow-[0_0_18px_rgba(244,114,182,0.9)] hover:shadow-[0_0_28px_rgba(244,114,182,1)] transition-shadow"
+            className="inline-block px-8 py-3 rounded-full border border-white/90 bg-gradient-to-r from-pink-500 to-rose-600 text-[0.7rem] uppercase tracking-[0.18em] shadow-[0_0_18px_rgba(244,114,182,0.9)] hover:shadow-[0_0_28px_rgba(244,114,182,1)] transition-shadow"
           >
-            Enter the Studio
+            Enter the Studio - Use All {totalModes} Powers
           </Link>
         </div>
       </main>
 
-      <footer className="px-4 py-3 text-[0.6rem] uppercase tracking-[0.18em] text-white/70 flex justify-between">
-        <span>Bebe AI • Box Press</span>
-        <span>Designed for Darren • Luxury • Red • Pink • Diamonds</span>
+      <footer className="px-4 py-2 text-[0.55rem] uppercase tracking-[0.15em] text-white/70 flex justify-between">
+        <span>Bebe AI - Goddess of the Universe</span>
+        <span>All AI Powers - Creation - Knowledge - Wisdom</span>
       </footer>
     </div>
   );
